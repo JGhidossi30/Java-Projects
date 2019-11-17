@@ -1,0 +1,82 @@
+<?xml version = "1.0"?>
+<project name="Project1" default="compile" basedir=".">
+  <description>
+    A sample build file for this project
+  </description>
+
+  <!-- Global Properties for this Build File -->
+  <property name="build.dir" location="bin" />
+  <property name="src.dir" location="src" />
+  <property name="main.build.dir" location="bin/main" />
+  <property name="main.src.dir" location="src/main" />
+  <property name="test.build.dir" location="bin/test" />
+  <property name="test.src.dir" location="src/test" />
+  <property name="doc.dir" location="doc" />
+  <property name="dist.dir" location="dist" />
+
+  <!-- set up some directories used by this project -->
+  <target name="init" description="setup project directories">
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${main.build.dir}" />
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${doc.dir}" />
+    <mkdir dir="${dist.dir}" />
+  </target>
+  
+  <!-- Compile the java code in ${src.dir} into ${build.dir} -->
+  <target name="compile" depends="init" description="compile java sources">
+    <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false" />
+  </target>
+
+  <!-- Generate javadocs for current project into ${doc.dir} -->
+  <target name="doc" depends="init" description="generate documentation">
+    <javadoc sourcepath="${main.src.dir}" destdir="${doc.dir}">
+<fileset dir="${src.dir}">
+                <include name="**" />
+           </fileset>
+</javadoc>
+  </target>
+
+  <!-- Create the distribution directory -->	
+  <target name="dist" depends="compile" description="package, output to JAR">
+    <mkdir dir="${dist.dir}" />
+
+    <!-- Put everything in ${build} into the MapSearch.jar file -->
+    <jar jarfile="${dist.dir}/MapSearch.jar" basedir="${main.build.dir}" >
+      <manifest>
+        <!-- create an executable Jar -->
+        <attribute name="Project1" value="MapSearch" />
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- Delete the build & doc directories and Emacs backup (*~) files -->
+  <target name="clean" description="tidy up the workspace">
+    <delete dir="${build.dir}" />
+    <delete dir="${doc.dir}" />
+    <delete dir="${dist.dir}" />
+    <delete>
+      <fileset defaultexcludes="no" dir="${src.dir}" includes="**/*~" />
+  </delete>
+</target>
+
+<target name="test-compile" depends="compile">
+    <mkdir dir="${test.build.dir}"/>
+    <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
+        <classpath refid="classpath.test"/>
+    </javac>
+  </target>
+
+  <target name="test" depends="test-compile">
+    <junit printsummary="on" haltonfailure="yes" fork="true">
+        <classpath>
+          <path refid="classpath.test"/>
+          <pathelement location="${test.build.dir}"/>
+        </classpath>
+        <formatter type="brief" usefile="false" />
+        <batchtest>
+            <fileset dir="${test.src.dir}" includes="**/*Test.java" />
+        </batchtest>
+    </junit>
+  </target>
+</project>
