@@ -1,2 +1,2 @@
-# Python Projects
-Projects created using Python
+# Java Projects
+Projects created using Java
